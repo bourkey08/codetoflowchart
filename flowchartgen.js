@@ -316,16 +316,32 @@ function TextChanged(text, img){
 //Saves the current svg as a pdf
 function DownloadPdf(orientation='p'){
     const svgElement = document.getElementById('flowchartcont').children[0];
-    const width = 300, height = 200;
-
+    
+    //We now need to work out the scale so that the image fits on the page we will calculate an x and y scale and then use which ever is smaller
+    let xscale = -1;
+    let yscale = -1;
+    
+    //If we are portrate then the page dimensions are 793.706 x 1,122.52
+    if (orientation == 'p'){
+        xscale = 793.706 / svgElement.clientWidth;
+        yscale = 1122.52 / svgElement.clientHeight; 
+        
+    } else {//Otherwise landscape is 1,122.52 x 793.706
+        xscale = 1122.52 / svgElement.clientWidth;
+        yscale = 793.706 / svgElement.clientHeight; 
+    }
+    
+    //Take the smallest of x, y and 1(we dont want to enlarge to fit page, this could be added as an option?)
+    const scale = Math.min(xscale, yscale, 1);
+    
     // create a new jsPDF instance
-    const pdf = new jsPDF(orientation, 'pt', 'a4');
-
+    const pdf = new jsPDF(orientation, 'pt', 'a4');    
+    
     // render the svg element
     svg2pdf(svgElement, pdf, {
         xOffset: 0,
         yOffset: 0,
-        scale: 1
+        scale: scale
     });
 
     // or simply save the created pdf
